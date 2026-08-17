@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128" role="img" aria-label="Inventory Scanner">
+  <rect width="128" height="128" rx="26" fill="#24483b"/>
+  <rect x="29" y="18" width="44" height="92" rx="11" fill="#f7f8f4"/>
+  <path d="M43 18h16v13a8 8 0 0 1-16 0z" fill="#c7503d"/>
+  <path d="M45 46h12v45H45zM62 46h5v45h-5M36 46h4v45h-4" fill="#24483b"/>
+  <path d="M82 38h15v52H82z" fill="#e2b84d"/>
+  <path d="M80 38h19v9H80z" fill="#f7f8f4"/>
+  <path d="M84 54h4v25h-4M92 54h2v25h-2" fill="#24483b"/>
+</svg>

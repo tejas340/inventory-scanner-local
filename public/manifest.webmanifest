@@ -1,0 +1,17 @@
+{
+  "name": "Inventory Scanner",
+  "short_name": "Inventory",
+  "description": "Local inventory scanner for iPhone and Mac.",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#f7f8f4",
+  "theme_color": "#24483b",
+  "icons": [
+    {
+      "src": "/icon.svg",
+      "sizes": "128x128",
+      "type": "image/svg+xml",
+      "purpose": "any"
+    }
+  ]
+}

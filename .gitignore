@@ -1,0 +1,21 @@
+# Local inventory data - keep private
+data/*.db
+data/*.db-*
+data/demo/
+exports/
+backups/
+certs/
+
+# Local machine files
+.DS_Store
+Thumbs.db
+*.log
+work/
+outputs/
+
+# Dependencies, if installed later
+node_modules/
+
+# Editor state
+.vscode/
+.idea/

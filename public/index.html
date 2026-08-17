@@ -1,0 +1,50 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+    <meta name="theme-color" content="#24483b">
+    <title>Inventory Scanner</title>
+    <link rel="manifest" href="/manifest.webmanifest">
+    <link rel="icon" href="/icon.svg" type="image/svg+xml">
+    <link rel="stylesheet" href="/styles.css">
+  </head>
+  <body>
+    <div class="app-shell">
+      <header class="topbar">
+        <div class="brand">
+          <img src="/icon.svg" alt="" class="brand-icon">
+          <div>
+            <strong>Inventory Scanner</strong>
+            <span id="connectionText">Local Mac storage</span>
+          </div>
+        </div>
+        <label class="demo-switch" title="Use sample products without touching real inventory">
+          <input id="demoToggle" type="checkbox">
+          <span>Demo</span>
+        </label>
+      </header>
+
+      <nav class="tabbar" aria-label="Main screens">
+        <button data-view="dashboard" class="tab active">Dashboard</button>
+        <button data-view="scan" class="tab">Scan</button>
+        <button data-view="inventory" class="tab">Inventory</button>
+        <button data-view="history" class="tab">History</button>
+        <button data-view="export" class="tab">Export</button>
+        <button data-view="lists" class="tab">Lists</button>
+      </nav>
+
+      <main id="app" class="main" tabindex="-1"></main>
+      <div id="toast" class="toast" role="status" aria-live="polite"></div>
+    </div>
+
+    <template id="emptyTemplate">
+      <div class="empty">
+        <strong>No results yet</strong>
+        <span>Try scanning a bottle or changing the search.</span>
+      </div>
+    </template>
+
+    <script type="module" src="/app.js"></script>
+  </body>
+</html>
