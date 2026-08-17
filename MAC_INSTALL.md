@@ -26,6 +26,29 @@ If macOS still blocks it:
 3. Scroll down and click `Open Anyway` for the blocked file.
 4. Try opening the file again.
 
+## If Mac Says It Is Harmful Or Cannot Verify It
+
+This usually means the files were downloaded from GitHub and macOS marked them as unverified. Only do this if the folder came from this repo:
+
+```text
+https://github.com/tejas340/inventory-scanner-local
+```
+
+Open `Terminal`, then paste these lines one at a time:
+
+```bash
+cd ~/Documents/inventory-scanner-local
+xattr -dr com.apple.quarantine .
+chmod +x "Start Inventory System.command" scripts/*.command
+./scripts/setup-mac.command
+```
+
+After setup finishes, start the app:
+
+```bash
+./"Start Inventory System.command"
+```
+
 ## If It Says Permission Denied
 
 Open `Terminal`, then paste these lines one at a time:
