@@ -93,3 +93,9 @@ The window will show two addresses:
 - iPhone address: usually like `http://192.168.x.x:3765`
 
 Open the iPhone address in Safari while the iPhone and Mac are on the same Wi-Fi.
+
+## If Live Camera Scan Does Not Work On iPhone
+
+Tap `Take Barcode Photo` on the Scan screen. That uses the iPhone camera to take one barcode photo and reads it with the scanner helper.
+
+If the iPhone still shows the old built-in scanner message, refresh Safari once. If you saved it to the Home Screen, remove that Home Screen icon and add it again after opening the latest address in Safari.

@@ -6,7 +6,11 @@ const state = {
   scanner: {
     stream: null,
     detector: null,
+    zxingReader: null,
+    zxingControls: null,
+    zxingPromise: null,
     active: false,
+    handling: false,
     lastCode: '',
     rapid: false,
     countMode: false,
@@ -139,15 +143,17 @@ function renderScan() {
       <section class="panel">
         <div class="mode-line">
           ${button('Start Camera', 'primary', 'id="startCamera"')}
+          ${button('Take Barcode Photo', '', 'id="photoScan" type="button"')}
           ${button('Stop', 'ghost', 'id="stopCamera"')}
           <label class="checkbox-line"><input type="checkbox" id="rapidToggle" ${state.scanner.rapid ? 'checked' : ''}> Rapid scan</label>
           <label class="checkbox-line"><input type="checkbox" id="countToggle" ${state.scanner.countMode ? 'checked' : ''}> Stock count</label>
         </div>
+        <input class="visually-hidden" id="barcodePhoto" type="file" accept="image/*" capture="environment">
         <div class="scanner-box" id="scannerBox">
           <div class="scanner-placeholder">
             <div>
               <h2>Ready to scan</h2>
-              <p>Use the iPhone camera when opened from a secure local address. Manual entry always works.</p>
+              <p>Use live camera, take a barcode photo, or type the number manually.</p>
             </div>
           </div>
           <div class="scanner-frame" aria-hidden="true"></div>
@@ -170,6 +176,8 @@ function renderScan() {
   `);
 
   app.querySelector('#startCamera').addEventListener('click', startScanner);
+  app.querySelector('#photoScan').addEventListener('click', () => app.querySelector('#barcodePhoto').click());
+  app.querySelector('#barcodePhoto').addEventListener('change', scanBarcodePhoto);
   app.querySelector('#stopCamera').addEventListener('click', stopScanner);
   app.querySelector('#rapidToggle').addEventListener('change', (event) => {
     state.scanner.rapid = event.target.checked;
@@ -202,36 +210,54 @@ function scanWaitingHtml() {
 async function startScanner() {
   const resultBox = app.querySelector('#scanResult');
   try {
-    if (!('mediaDevices' in navigator)) {
-      throw new Error('Camera is not available in this browser. Use manual barcode entry.');
-    }
-    if (!('BarcodeDetector' in window)) {
-      throw new Error('This browser does not have built-in barcode reading. Use manual barcode entry for now.');
+    if (!navigator.mediaDevices?.getUserMedia) {
+      throw new Error(cameraAccessMessage());
     }
 
-    state.scanner.detector = new BarcodeDetector({
-      formats: ['ean_13', 'ean_8', 'upc_a', 'upc_e', 'code_128', 'code_39', 'qr_code']
-    });
-    state.scanner.stream = await navigator.mediaDevices.getUserMedia({
-      video: {
-        facingMode: 'environment',
-        width: { ideal: 1280 },
-        height: { ideal: 720 }
-      },
-      audio: false
-    });
+    stopScanner();
     state.scanner.active = true;
 
     const scannerBox = app.querySelector('#scannerBox');
     scannerBox.innerHTML = '<video id="video" playsinline muted></video><div class="scanner-frame" aria-hidden="true"></div>';
     const video = scannerBox.querySelector('video');
-    video.srcObject = state.scanner.stream;
-    await video.play();
+
+    if ('BarcodeDetector' in window) {
+      await startNativeScanner(video);
+    } else {
+      await startZxingScanner(video);
+    }
+
     resultBox.innerHTML = '<div class="notice success">Camera is on. Point it at the barcode.</div>';
-    scanLoop(video);
   } catch (error) {
+    stopScanner();
     resultBox.innerHTML = `<div class="notice warning">${escapeHtml(error.message)}</div>`;
   }
+}
+
+async function startNativeScanner(video) {
+  state.scanner.detector = new BarcodeDetector({
+    formats: ['ean_13', 'ean_8', 'upc_a', 'upc_e', 'code_128', 'code_39', 'qr_code']
+  });
+  state.scanner.stream = await navigator.mediaDevices.getUserMedia({
+    video: cameraConstraints(),
+    audio: false
+  });
+  video.srcObject = state.scanner.stream;
+  await video.play();
+  scanLoop(video);
+}
+
+async function startZxingScanner(video) {
+  const ZXingBrowser = await loadZxingLibrary();
+  state.scanner.zxingReader = new ZXingBrowser.BrowserMultiFormatReader();
+  state.scanner.zxingControls = await state.scanner.zxingReader.decodeFromConstraints(
+    { video: cameraConstraints(), audio: false },
+    video,
+    async (result) => {
+      const value = barcodeText(result);
+      if (value) await onDetectedBarcode(value);
+    }
+  );
 }
 
 async function scanLoop(video) {
@@ -239,27 +265,151 @@ async function scanLoop(video) {
   try {
     const codes = await state.scanner.detector.detect(video);
     const value = codes?.[0]?.rawValue;
-    if (value && value !== state.scanner.lastCode) {
-      state.scanner.lastCode = value;
-      await handleBarcode(value);
-      if (!state.scanner.rapid) {
-        stopScanner();
-        return;
-      }
-    }
+    if (value) await onDetectedBarcode(value);
   } catch {
     // A camera frame can fail while focus adjusts; the next frame usually succeeds.
   }
   requestAnimationFrame(() => scanLoop(video));
 }
 
+async function onDetectedBarcode(value) {
+  if (!state.scanner.active || state.scanner.handling || value === state.scanner.lastCode) return;
+  state.scanner.handling = true;
+  state.scanner.lastCode = value;
+  try {
+    await handleBarcode(value);
+    if (!state.scanner.rapid) {
+      stopScanner();
+    }
+  } finally {
+    state.scanner.handling = false;
+  }
+}
+
 function stopScanner() {
   state.scanner.active = false;
+  state.scanner.handling = false;
   state.scanner.lastCode = '';
+  if (state.scanner.zxingControls) {
+    try {
+      state.scanner.zxingControls.stop();
+    } catch {}
+  }
+  if (state.scanner.zxingReader?.reset) {
+    state.scanner.zxingReader.reset();
+  }
+  state.scanner.zxingControls = null;
+  state.scanner.zxingReader = null;
+  state.scanner.detector = null;
   if (state.scanner.stream) {
     state.scanner.stream.getTracks().forEach((track) => track.stop());
   }
   state.scanner.stream = null;
+}
+
+async function scanBarcodePhoto(event) {
+  const file = event.target.files?.[0];
+  event.target.value = '';
+  if (!file) return;
+
+  const resultBox = app.querySelector('#scanResult');
+  resultBox.innerHTML = '<div class="notice">Reading barcode photo...</div>';
+
+  try {
+    const value = await decodeBarcodeImage(file);
+    if (!value) {
+      throw new Error('No barcode found in that photo. Try again with the barcode closer and brighter.');
+    }
+    await handleBarcode(value);
+  } catch (error) {
+    resultBox.innerHTML = `<div class="notice warning">${escapeHtml(error.message)}</div>`;
+  }
+}
+
+async function decodeBarcodeImage(file) {
+  const imageUrl = URL.createObjectURL(file);
+  const image = new Image();
+  image.decoding = 'async';
+  try {
+    await new Promise((resolve, reject) => {
+      image.onload = resolve;
+      image.onerror = () => reject(new Error('Could not read that photo. Try taking it again.'));
+      image.src = imageUrl;
+    });
+
+    if ('BarcodeDetector' in window) {
+      const detector = new BarcodeDetector({
+        formats: ['ean_13', 'ean_8', 'upc_a', 'upc_e', 'code_128', 'code_39', 'qr_code']
+      });
+      const codes = await detector.detect(image);
+      const value = codes?.[0]?.rawValue;
+      if (value) return value;
+    }
+
+    const ZXingBrowser = await loadZxingLibrary();
+    const reader = new ZXingBrowser.BrowserMultiFormatReader();
+    const result = await reader.decodeFromImageElement(image);
+    return barcodeText(result);
+  } finally {
+    URL.revokeObjectURL(imageUrl);
+  }
+}
+
+function cameraConstraints() {
+  return {
+    facingMode: { ideal: 'environment' },
+    width: { ideal: 1280 },
+    height: { ideal: 720 }
+  };
+}
+
+function cameraAccessMessage() {
+  if (!window.isSecureContext && location.hostname !== 'localhost' && location.hostname !== '127.0.0.1') {
+    return 'Live camera needs a secure local address on iPhone. Tap Take Barcode Photo or use manual barcode entry for now.';
+  }
+  return 'Camera is not available in this browser. Tap Take Barcode Photo or use manual barcode entry.';
+}
+
+function barcodeText(result) {
+  if (!result) return '';
+  if (typeof result.getText === 'function') return result.getText();
+  return result.text || result.rawValue || '';
+}
+
+async function loadZxingLibrary() {
+  if (window.ZXingBrowser) return Promise.resolve(window.ZXingBrowser);
+  if (state.scanner.zxingPromise) return state.scanner.zxingPromise;
+
+  const urls = [
+    'https://unpkg.com/@zxing/browser@0.2.1',
+    'https://cdn.jsdelivr.net/npm/@zxing/browser@0.2.1/umd/zxing-browser.min.js'
+  ];
+
+  state.scanner.zxingPromise = loadFirstScript(urls).then(() => window.ZXingBrowser);
+
+  return state.scanner.zxingPromise;
+}
+
+async function loadFirstScript(urls) {
+  for (const url of urls) {
+    try {
+      await loadScript(url);
+      if (window.ZXingBrowser) return;
+    } catch {}
+  }
+  state.scanner.zxingPromise = null;
+  throw new Error('Could not load the barcode scanner helper. Check internet once, then try again, or use manual entry.');
+}
+
+function loadScript(src) {
+  return new Promise((resolve, reject) => {
+    const script = document.createElement('script');
+    script.src = src;
+    script.async = true;
+    script.onload = resolve;
+    script.onerror = reject;
+    document.head.appendChild(script);
+  });
 }
 
 async function handleBarcode(rawCode) {

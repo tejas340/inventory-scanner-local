@@ -14,7 +14,8 @@ It is designed for a non-technical daily workflow:
 ## What V1 Includes
 
 - Dashboard with product totals, low-stock count, attention count, low-stock list, and recent changes.
-- iPhone browser/PWA scanner page using the browser camera when available.
+- iPhone browser/PWA scanner page using live camera when available.
+- Barcode photo scan fallback for iPhone browsers that do not support built-in barcode reading.
 - Manual barcode entry fallback.
 - Unknown barcode setup.
 - Barcode-linked bottle/product name, bottle size, vendor, category, location, quality, quantity, low-stock level, and notes.
