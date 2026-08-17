@@ -699,7 +699,7 @@ async function loadBackups() {
 
 function renderLists() {
   const optionTypes = [
-    ['bottle_size', 'Bottle Sizes'],
+    ['bottle_size', 'Bottle Sizes & Units'],
     ['vendor', 'Vendors'],
     ['quality', 'Quality / Condition'],
     ['category', 'Categories'],

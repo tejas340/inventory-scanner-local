@@ -24,6 +24,7 @@ It is designed for a non-technical daily workflow:
 - Searchable inventory list.
 - Inventory history.
 - Editable lists for bottle sizes, vendors, quality/condition, categories, locations, and reasons.
+- Built-in bottle-size options using ml, cl, L, oz, fl oz, pint, quart, and gallon formats.
 - Excel export with Current Inventory, History, Low Stock, and Products tabs.
 - Excel column order control for matching a Google Sheet or Excel template.
 - Local backups and restore.

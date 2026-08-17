@@ -9,7 +9,7 @@
 7. Bottle/product name saved against a barcode.
 8. Bottle size saved against a barcode.
 9. Vendor saved against a barcode.
-10. Editable bottle sizes.
+10. Editable bottle sizes and units such as ml, cl, L, oz, fl oz, pint, quart, and gallon.
 11. Editable vendor names.
 12. Automatic prefill after scan.
 13. Missing information warning for bottle name, bottle size, and vendor.
