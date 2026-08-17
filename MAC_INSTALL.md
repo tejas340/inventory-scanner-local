@@ -1,6 +1,6 @@
 # Mac Install Help
 
-Use these steps if the normal double-click install does not open.
+Use these steps if the normal double-click start does not open.
 
 ## First Try
 
@@ -8,14 +8,23 @@ Use these steps if the normal double-click install does not open.
 2. Download this repo from GitHub, then unzip it.
 3. Move the `inventory-scanner-local` folder to `Documents`.
 4. Open the folder.
-5. Control-click `scripts/setup-mac.command`, then choose `Open`.
-6. When the setup finishes, Control-click `Start Inventory System.command`, then choose `Open`.
+5. Double-click `CLICK TO START - Inventory Scanner.command`.
 
-Keep the window open while using the scanner.
+It will prepare the folders, start the scanner, and open the Mac browser automatically. Keep the small window open while using the scanner.
+
+## If Mac Blocks The First Double-Click
+
+Apple may block the first open because this is a GitHub download, not an Apple-signed app.
+
+1. Control-click `CLICK TO START - Inventory Scanner.command`.
+2. Choose `Open`.
+3. Click `Open` again if Mac asks.
+
+After that, normal double-click should work.
 
 ## If Mac Says The File Cannot Be Opened
 
-1. Control-click the `.command` file.
+1. Control-click `CLICK TO START - Inventory Scanner.command`.
 2. Choose `Open`.
 3. Click `Open` again if Mac asks.
 
@@ -39,14 +48,8 @@ Open `Terminal`, then paste these lines one at a time:
 ```bash
 cd ~/Documents/inventory-scanner-local
 xattr -dr com.apple.quarantine .
-chmod +x "Start Inventory System.command" scripts/*.command
-./scripts/setup-mac.command
-```
-
-After setup finishes, start the app:
-
-```bash
-./"Start Inventory System.command"
+chmod +x "CLICK TO START - Inventory Scanner.command" "Start Inventory System.command" scripts/*.command
+./"CLICK TO START - Inventory Scanner.command"
 ```
 
 ## If It Says Permission Denied
@@ -55,14 +58,8 @@ Open `Terminal`, then paste these lines one at a time:
 
 ```bash
 cd ~/Documents/inventory-scanner-local
-chmod +x "Start Inventory System.command" scripts/*.command
-./scripts/setup-mac.command
-```
-
-After setup finishes, start the app:
-
-```bash
-./"Start Inventory System.command"
+chmod +x "CLICK TO START - Inventory Scanner.command" "Start Inventory System.command" scripts/*.command
+./"CLICK TO START - Inventory Scanner.command"
 ```
 
 ## If It Says Node Is Not Installed
@@ -75,7 +72,7 @@ Then close Terminal, open a new Terminal window, and run:
 node -v
 ```
 
-If the number starts with `24` or higher, open `Start Inventory System.command` again.
+If the number starts with `24` or higher, open `CLICK TO START - Inventory Scanner.command` again.
 
 ## If You Used Git Instead Of Download
 
@@ -85,8 +82,7 @@ Open `Terminal`, then run:
 cd ~/Documents
 git clone https://github.com/tejas340/inventory-scanner-local.git
 cd inventory-scanner-local
-./scripts/setup-mac.command
-./"Start Inventory System.command"
+./"CLICK TO START - Inventory Scanner.command"
 ```
 
 ## When The App Starts

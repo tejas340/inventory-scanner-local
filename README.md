@@ -47,13 +47,13 @@ Node.js can be installed from [nodejs.org](https://nodejs.org).
 ## Start On The Mac
 
 1. Download or clone this project.
-2. Open `scripts/setup-mac.command` once.
-3. Open `Start Inventory System.command`.
-4. Keep that window open while using the scanner.
+2. Move the folder to `Documents`.
+3. Open `CLICK TO START - Inventory Scanner.command`.
+4. Keep that small window open while using the scanner.
 
 If macOS blocks the file, says it cannot be opened, or shows a permission error, use [Mac Install Help](MAC_INSTALL.md).
 
-The app prints two addresses:
+The app opens the Mac browser automatically and prints two addresses:
 
 - One for the Mac, usually `http://localhost:3765`
 - One for the iPhone, usually like `http://192.168.x.x:3765`
@@ -118,6 +118,7 @@ These folders are ignored by Git so real inventory, backups, exports, and certif
 ## Useful Commands
 
 ```bash
+./"CLICK TO START - Inventory Scanner.command"
 npm start
 npm test
 ```
