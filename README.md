@@ -51,6 +51,8 @@ Node.js can be installed from [nodejs.org](https://nodejs.org).
 3. Open `Start Inventory System.command`.
 4. Keep that window open while using the scanner.
 
+If macOS blocks the file, says it cannot be opened, or shows a permission error, use [Mac Install Help](MAC_INSTALL.md).
+
 The app prints two addresses:
 
 - One for the Mac, usually `http://localhost:3765`
