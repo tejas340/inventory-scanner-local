@@ -1,5 +1,5 @@
-const CACHE_NAME = 'inventory-scanner-v3';
-const ASSETS = ['/', '/index.html', '/styles.css', '/app.js', '/scanner-photo-fix.js', '/icon.svg', '/manifest.webmanifest'];
+const CACHE_NAME = 'inventory-scanner-v4';
+const ASSETS = ['/', '/index.html', '/styles.css', '/app.js', '/scanner-live-fix.js', '/scanner-photo-fix.js', '/icon.svg', '/manifest.webmanifest'];
 
 self.addEventListener('install', (event) => {
   event.waitUntil(caches.open(CACHE_NAME).then((cache) => cache.addAll(ASSETS)));
